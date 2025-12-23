@@ -1,18 +1,15 @@
 # Pimcore Simple Search Bundle
 Bundle for full-text search in Pimcore 11 using MySQL FULLTEXT index
-1. Instalacja
-Zainstaluj bundle
+### Install the bundle
 ```bash
    composer require insquare/pimcore-simple-search-bundle
 ```
-2. Stwórz konfigurację
+### Create a configuration
 ```bash
    touch config/packages/insquare_pimcore_simple_search.yaml
 ```
 
-
-
-Podstawowa konfiguracja ()
+#### Basic configuration
 ```yaml
 #config/packages/insquare_pimcore_simple_search.yaml
 in_square_pimcore_simple_search:
@@ -27,7 +24,7 @@ in_square_pimcore_simple_search:
    min_search_length: 3
 ```
 
-3. Utwórz extractory
+### Create object extractors
 ```php
 <?php
 // src/Search/Extractor/ProductExtractor.php
@@ -60,7 +57,7 @@ final readonly class ProductExtractor implements ObjectContentExtractorInterface
     }
 }
 ```
-4. Zarejestruj extractor jak tagged service
+#### Register extractor as a tagged service
 
 ```yaml
 #config/services.yaml
@@ -69,20 +66,26 @@ services:
     tags:
       - { name: 'insquare.search.object_extractor' }
 ```
-Bundle automatycznie wykryje extractor i przypisze go do klasy Product.
 
-5. Uruchom komendę
+Bundle will automatically detect the extractor and assign it to the Product class.
+
+### Run the installation command
 ```bash
  bin/console insquare:search:install
 ```
 
-# Reindeksuj wszystko
+### Index all items
+```bash
 bin/console insquare:search:reindex
+```
 
-# Uruchom workera messenger
+## Symfony Messenger
+
+### Start the messenger worker
+```php
 bin/console messenger:consume async -vv
+```
 
-Messenger
 Route bundle message to async transport (recommended):
 
 ```yaml
@@ -93,10 +96,8 @@ framework:
       InSquare\PimcoreMysqlSearchIndexBundle\Message\IndexElementMessage: async
 ```
 
-`* * * * * /usr/bin/php /path/bin/console messenger:consume async --time-limit=50 --memory-limit=256M >> /path/var/log/search-consume.log 2>&1
-`
+### Use in the controller
 
-Użycie w kontrolerze
 ```php
 use InSquare\PimcoreSimpleSearchBundle\Service\SearchService;
 
