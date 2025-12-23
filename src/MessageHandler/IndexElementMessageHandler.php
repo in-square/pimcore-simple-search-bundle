@@ -41,14 +41,13 @@ readonly class IndexElementMessageHandler
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // Re-throw to let Messenger retry mechanism handle it
             throw $e;
         }
     }
 
     private function handleDelete(IndexElementMessage $msg): void
     {
-        $this->indexer->delete($msg->type, $msg->id);
+        $this->indexer->deleteElement($msg->type, $msg->id);
 
         $this->logger->info('Deleted from search index', [
             'type' => $msg->type,

@@ -48,7 +48,6 @@ final readonly class SearchIndexRepository
     }
 
     /**
-     * Delete single element by type and ID
      * @throws Exception
      */
     public function deleteOne(string $type, int $extId): void
@@ -67,7 +66,6 @@ final readonly class SearchIndexRepository
     }
 
     /**
-     * Delete all entries (for clear command)
      * @throws Exception
      */
     public function deleteAll(): void
@@ -77,7 +75,6 @@ final readonly class SearchIndexRepository
     }
 
     /**
-     * Get statistics about indexed content
      * @return array{total: int, documents: int, objects: int, published: int, unpublished: int}
      * @throws Exception
      */
@@ -105,9 +102,6 @@ final readonly class SearchIndexRepository
         ];
     }
 
-    /**
-     * Check if element exists in index
-     */
     public function exists(string $type, int $extId, string $locale, int $site): bool
     {
         $this->validateType($type);

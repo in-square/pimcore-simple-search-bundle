@@ -23,14 +23,11 @@ final readonly class SimpleSiteResolver implements SiteResolverInterface
             return $siteId;
         }
 
-        // Fallback to first configured site
         return $this->sites[0] ?? 0;
     }
 
     public function resolveForObject(Concrete $object): int
     {
-        // For objects, return first configured site
-        // Override this in your app if objects have site-specific logic
         return $this->sites[0] ?? 0;
     }
 

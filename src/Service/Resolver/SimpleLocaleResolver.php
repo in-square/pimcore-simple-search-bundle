@@ -16,21 +16,17 @@ final readonly class SimpleLocaleResolver implements LocaleResolverInterface
 
     public function resolveForDocument(Page $document): ?string
     {
-        // Try to get locale from document property
         $locale = $document->getProperty('language');
 
         if ($locale !== null && $this->isValidLocale($locale)) {
             return $locale;
         }
 
-        // Fallback to first configured locale
         return $this->locales[0] ?? null;
     }
 
     public function resolveForObject(Concrete $object): iterable
     {
-        // For objects, return all configured locales
-        // This allows indexing multi-language content
         return $this->locales;
     }
 

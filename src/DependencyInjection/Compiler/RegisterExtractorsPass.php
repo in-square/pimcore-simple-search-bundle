@@ -36,7 +36,6 @@ class RegisterExtractorsPass implements CompilerPassInterface
                 ));
             }
 
-            // Verify it implements the interface
             $reflection = new \ReflectionClass($class);
             if (!$reflection->implementsInterface(ObjectContentExtractorInterface::class)) {
                 throw new \RuntimeException(sprintf(
@@ -47,13 +46,9 @@ class RegisterExtractorsPass implements CompilerPassInterface
                 ));
             }
 
-            // Get supported class from the extractor
-            // We need to instantiate temporarily or use static analysis
-            // For now, we'll store reference and let runtime handle it
             $extractors[$serviceId] = new Reference($serviceId);
         }
 
-        // Pass all extractors to registry
         $registry->setArgument('$extractors', $extractors);
     }
 }

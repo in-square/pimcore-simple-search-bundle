@@ -4,10 +4,12 @@
   "type": "pimcore-bundle",
   "keywords": ["pimcore", "search", "pimcore-bundle", "pimcore-plugin"],
   "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/in-square/pimcore-simple-search-bundle",
   "authors": [
     {
       "name": "Władysław Dudko",
-      "email": "w.dudko@insquare.pl"
+      "email": "w.dudko@insquare.pl",
+      "homepage": "https://insquare.pl/"
     }
   ],
   "require": {
@@ -25,8 +27,10 @@
     }
   },
   "extra": {
-    "branch-alias": {
-      "dev-main": "1.0-dev"
+    "pimcore": {
+      "bundles": [
+        "InSquare\\PimcoreSimpleSearchBundle"
+      ]
     }
   }
 }

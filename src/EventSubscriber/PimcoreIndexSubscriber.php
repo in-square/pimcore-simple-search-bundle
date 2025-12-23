@@ -110,7 +110,6 @@ final readonly class PimcoreIndexSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Only index objects that have a registered extractor
         if (!$this->extractorRegistry->hasExtractorFor($object)) {
             return;
         }
@@ -148,7 +147,6 @@ final readonly class PimcoreIndexSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // Only process objects that have a registered extractor
         if (!$this->extractorRegistry->hasExtractorFor($object)) {
             return;
         }

@@ -3,8 +3,6 @@
 namespace InSquare\PimcoreSimpleSearchBundle\Service;
 
 use Doctrine\DBAL\Connection;
-use Pimcore\Model\DataObject;
-use Pimcore\Model\Document;
 
 readonly class SearchService
 {
@@ -76,9 +74,6 @@ readonly class SearchService
         return $results;
     }
 
-    /**
-     * Count total results for pagination
-     */
     public function count(
         string $query,
         string $locale,
@@ -121,7 +116,6 @@ readonly class SearchService
             return $query;
         }
 
-        // Add wildcard for partial word matching in boolean mode
         $words = explode(' ', $query);
         $words = array_filter($words, fn($w) => mb_strlen($w) >= $this->minSearchLength);
 
@@ -129,13 +123,11 @@ readonly class SearchService
             return $query;
         }
 
-        // Add + prefix for AND logic and * suffix for wildcard
         return implode(' ', array_map(fn($w) => "+{$w}*", $words));
     }
 
     private function getSnippetExpression(): string
     {
-        // MySQL doesn't have built-in snippet function, so we'll take first N chars
         return sprintf(
             "SUBSTRING(content, 1, %d)",
             $this->snippetLength

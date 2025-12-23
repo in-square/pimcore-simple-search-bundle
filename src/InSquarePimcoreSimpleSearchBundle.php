@@ -14,7 +14,6 @@ final class InSquarePimcoreSimpleSearchBundle extends Bundle
     {
         parent::build($container);
 
-        // Register compiler pass for automatic extractor registration
         $container->addCompilerPass(new RegisterExtractorsPass());
     }
 
