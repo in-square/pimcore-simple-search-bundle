@@ -1,0 +1,57 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    InSquare\PimcoreSimpleSearchBundle\:
+        resource: '../../'
+        exclude:
+            - '../../DependencyInjection/'
+            - '../../Resources/'
+            - '../../InSquarePimcoreSimpleSearchBundle.php'
+
+    InSquare\PimcoreSimpleSearchBundle\Repository\SearchIndexRepository:
+        arguments:
+            $tableName: '%in_square_pimcore_simple_search.table_name%'
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Extractor\DocumentContentExtractor:
+        arguments:
+            $maxContentLength: '%in_square_pimcore_simple_search.max_content_length%'
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Extractor\DocumentExtractorInterface:
+        alias: InSquare\PimcoreSimpleSearchBundle\Service\Extractor\DocumentContentExtractor
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Extractor\ObjectExtractorRegistry:
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Indexer:
+        arguments:
+            $maxContentLength: '%in_square_pimcore_simple_search.max_content_length%'
+
+    InSquare\PimcoreSimpleSearchBundle\Service\SearchService:
+        arguments:
+            $tableName: '%in_square_pimcore_simple_search.table_name%'
+            $snippetLength: '%in_square_pimcore_simple_search.snippet_length%'
+            $useBooleanMode: '%in_square_pimcore_simple_search.use_boolean_mode%'
+            $minSearchLength: '%in_square_pimcore_simple_search.min_search_length%'
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Resolver\SimpleLocaleResolver:
+        arguments:
+            $locales: '%in_square_pimcore_simple_search.locales%'
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Resolver\SimpleSiteResolver:
+        arguments:
+            $sites: '%in_square_pimcore_simple_search.sites%'
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Resolver\LocaleResolverInterface:
+        alias: InSquare\PimcoreSimpleSearchBundle\Service\Resolver\SimpleLocaleResolver
+
+    InSquare\PimcoreSimpleSearchBundle\Service\Resolver\SiteResolverInterface:
+        alias: InSquare\PimcoreSimpleSearchBundle\Service\Resolver\SimpleSiteResolver
+
+    InSquare\PimcoreSimpleSearchBundle\EventSubscriber\PimcoreIndexSubscriber:
+        arguments:
+            $indexDocuments: '%in_square_pimcore_simple_search.index_documents%'
+            $indexObjects: '%in_square_pimcore_simple_search.index_objects%'
+        tags:
+            - { name: kernel.event_subscriber }
