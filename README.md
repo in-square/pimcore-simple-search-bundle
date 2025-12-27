@@ -2,26 +2,36 @@
 Bundle for full-text search in Pimcore 11 using MySQL FULLTEXT index
 ### Install the bundle
 ```bash
-   composer require insquare/pimcore-simple-search-bundle
+   composer require in-square/pimcore-simple-search-bundle
 ```
 ### Create a configuration
 ```bash
-   touch config/packages/insquare_pimcore_simple_search.yaml
+   touch config/packages/in_square_pimcore_simple_search.yaml
 ```
 
 #### Basic configuration
 ```yaml
 #config/packages/insquare_pimcore_simple_search.yaml
 in_square_pimcore_simple_search:
-   table_name: 'search_index'
-   locales: ['pl', 'en']
-   sites: [0]
-   index_documents: true
-   index_objects: true
-   max_content_length: 20000
-   snippet_length: 220
-   use_boolean_mode: true
-   min_search_length: 3
+    table_name: 'insquare_search_index'
+    locales: ['pl', 'en']
+    sites: [0]
+    index_documents: true
+    index_objects: true
+    max_content_length: 20000
+    snippet_length: 220
+    use_boolean_mode: true
+    min_search_length: 3
+```
+
+### Register bundle in bundles.php
+```php
+<?php
+// config/bundles.php
+return [
+    // other bundles
+    InSquare\PimcoreSimpleSearchBundle\InSquarePimcoreSimpleSearchBundle::class => ['all' => true],
+];
 ```
 
 ### Create object extractors
