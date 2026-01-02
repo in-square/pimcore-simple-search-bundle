@@ -31,7 +31,7 @@ class TextNormalizer
     /**
      * @param array<int, string|null> $parts
      */
-    public static function join(array $parts, string $glue = "\n"): ?string
+    public static function join(array $parts, string $glue = " "): ?string
     {
         $normalized = array_filter(
             array_map([self::class, 'normalize'], $parts),

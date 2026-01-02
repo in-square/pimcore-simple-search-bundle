@@ -103,7 +103,7 @@ Route bundle message to async transport (recommended):
 framework:
   messenger:
     routing:
-      InSquare\PimcoreMysqlSearchIndexBundle\Message\IndexElementMessage: async
+        InSquare\PimcoreSimpleSearchBundle\Message\IndexElementMessage: async
 ```
 
 ### Use in the controller
