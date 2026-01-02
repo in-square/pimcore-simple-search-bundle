@@ -4,6 +4,7 @@ namespace InSquare\PimcoreSimpleSearchBundle\Command;
 
 use InSquare\PimcoreSimpleSearchBundle\Message\IndexElementMessage;
 use InSquare\PimcoreSimpleSearchBundle\Service\Extractor\ObjectExtractorRegistry;
+use Pimcore\Model\DataObject\ClassDefinition;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\Document\Listing as DocumentListing;
 use Pimcore\Model\DataObject\Listing as DataObjectListing;
@@ -140,11 +141,42 @@ class ReindexCommand extends Command
             implode(', ', array_map(fn($c) => basename(str_replace('\\', '/', $c)), $supportedClasses))
         ));
 
-        $listing = new DataObjectListing();
-        $listing->setUnpublished(true);
+        $classDefinitions = [];
+        $missingDefinitions = [];
+        $total = 0;
 
-        $total = $listing->getTotalCount();
-        $io->info(sprintf('Checking %d total objects', $total));
+        foreach ($supportedClasses as $supportedClass) {
+            $className = basename(str_replace('\\', '/', $supportedClass));
+            $definition = ClassDefinition::getByName($className);
+
+            if (!$definition instanceof ClassDefinition) {
+                $missingDefinitions[] = $supportedClass;
+                continue;
+            }
+
+            $classDefinitions[] = $definition;
+
+            $listing = new DataObjectListing();
+            $listing->setUnpublished(false);
+            $listing->setCondition('o_classId = :classId', [
+                'classId' => $definition->getId(),
+            ]);
+
+            $total += $listing->getTotalCount();
+        }
+
+        if (!empty($missingDefinitions)) {
+            $io->warning(sprintf(
+                'Missing class definitions for: %s',
+                implode(', ', $missingDefinitions)
+            ));
+        }
+
+        $io->info(sprintf('Found %d objects in supported classes', $total));
+
+        if ($total === 0) {
+            return;
+        }
 
         $progressBar = $io->createProgressBar($total);
         $progressBar->start();
@@ -152,26 +184,28 @@ class ReindexCommand extends Command
         $indexed = 0;
         $skipped = 0;
 
-        foreach ($listing as $object) {
-            if (!$object instanceof Concrete) {
-                $skipped++;
-                $progressBar->advance();
-                continue;
-            }
+        foreach ($classDefinitions as $definition) {
+            $listing = new DataObjectListing();
+            $listing->setUnpublished(false);
+            $listing->setCondition('o_classId = :classId', [
+                'classId' => $definition->getId(),
+            ]);
 
-            if (!$this->extractorRegistry->hasExtractorFor($object)) {
-                $skipped++;
-                $progressBar->advance();
-                continue;
-            }
+            foreach ($listing as $object) {
+                if (!$object instanceof Concrete) {
+                    $skipped++;
+                    $progressBar->advance();
+                    continue;
+                }
 
-            $this->bus->dispatch(new IndexElementMessage(
-                type: 'object',
-                id: $object->getId(),
-                delete: false
-            ));
-            $indexed++;
-            $progressBar->advance();
+                $this->bus->dispatch(new IndexElementMessage(
+                    type: 'object',
+                    id: $object->getId(),
+                    delete: false
+                ));
+                $indexed++;
+                $progressBar->advance();
+            }
         }
 
         $progressBar->finish();

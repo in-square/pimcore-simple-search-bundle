@@ -8,4 +8,5 @@ interface ObjectContentExtractorInterface
 {
     public function getSupportedClass(): string;
     public function extractContent(Concrete $object, string $locale): ?string;
+    public function isValid(Concrete $object, string $locale): bool;
 }

@@ -79,6 +79,10 @@ final readonly class Indexer
             $site = $this->siteResolver->resolveForObject($object);
 
             foreach ($this->localeResolver->resolveForObject($object) as $locale) {
+                if (!$extractor->isValid($object, $locale)) {
+                    continue;
+                }
+
                 $content = $extractor->extractContent($object, $locale);
 
                 $this->repository->upsert([

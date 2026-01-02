@@ -35,6 +35,7 @@ return [
 ```
 
 ### Create object extractors
+`isValid()` allows you to skip indexing for a given object/locale combination.
 ```php
 <?php
 // src/Search/Extractor/ProductExtractor.php
@@ -51,6 +52,11 @@ final readonly class ProductExtractor implements ObjectContentExtractorInterface
     public function getSupportedClass(): string
     {
         return Product::class;
+    }
+
+    public function isValid(Concrete $object, string $locale): bool
+    {
+        return $object instanceof Product && $object->isPublished();
     }
 
     public function extractContent(Concrete $object, string $locale): ?string
