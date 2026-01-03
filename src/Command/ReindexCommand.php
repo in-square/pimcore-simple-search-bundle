@@ -4,10 +4,9 @@ namespace InSquare\PimcoreSimpleSearchBundle\Command;
 
 use InSquare\PimcoreSimpleSearchBundle\Message\IndexElementMessage;
 use InSquare\PimcoreSimpleSearchBundle\Service\Extractor\ObjectExtractorRegistry;
-use Pimcore\Model\DataObject\ClassDefinition;
+use Pimcore\Model\DataObject\AbstractObject;
 use Pimcore\Model\DataObject\Concrete;
 use Pimcore\Model\Document\Listing as DocumentListing;
-use Pimcore\Model\DataObject\Listing as DataObjectListing;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -141,34 +140,33 @@ class ReindexCommand extends Command
             implode(', ', array_map(fn($c) => basename(str_replace('\\', '/', $c)), $supportedClasses))
         ));
 
-        $classDefinitions = [];
-        $missingDefinitions = [];
+        $listingClasses = [];
+        $missingListings = [];
         $total = 0;
 
         foreach ($supportedClasses as $supportedClass) {
-            $className = basename(str_replace('\\', '/', $supportedClass));
-            $definition = ClassDefinition::getByName($className);
-
-            if (!$definition instanceof ClassDefinition) {
-                $missingDefinitions[] = $supportedClass;
+            if (!class_exists($supportedClass)) {
+                $missingListings[] = $supportedClass;
                 continue;
             }
 
-            $classDefinitions[] = $definition;
+            if (!is_subclass_of($supportedClass, AbstractObject::class)) {
+                $missingListings[] = $supportedClass;
+                continue;
+            }
 
-            $listing = new DataObjectListing();
+            $listingClasses[] = $supportedClass;
+
+            $listing = $supportedClass::getList();
             $listing->setUnpublished(false);
-            $listing->setCondition('o_classId = :classId', [
-                'classId' => $definition->getId(),
-            ]);
 
             $total += $listing->getTotalCount();
         }
 
-        if (!empty($missingDefinitions)) {
+        if (!empty($missingListings)) {
             $io->warning(sprintf(
-                'Missing class definitions for: %s',
-                implode(', ', $missingDefinitions)
+                'Missing data object classes for: %s',
+                implode(', ', $missingListings)
             ));
         }
 
@@ -184,12 +182,9 @@ class ReindexCommand extends Command
         $indexed = 0;
         $skipped = 0;
 
-        foreach ($classDefinitions as $definition) {
-            $listing = new DataObjectListing();
+        foreach ($listingClasses as $listingClass) {
+            $listing = $listingClass::getList();
             $listing->setUnpublished(false);
-            $listing->setCondition('o_classId = :classId', [
-                'classId' => $definition->getId(),
-            ]);
 
             foreach ($listing as $object) {
                 if (!$object instanceof Concrete) {
